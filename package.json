@@ -40,5 +40,8 @@
   "lint-staged": {
     "*.{js,ts,cjs,svelte}": "eslint --cache --fix",
     "*.{js,ts,cjs,svelte,json,html,css,md}": "prettier --write"
+  },
+  "dependencies": {
+    "firebase": "^9.6.10"
   }
 }
