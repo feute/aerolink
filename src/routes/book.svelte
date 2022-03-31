@@ -52,8 +52,6 @@
       _places.push({ id: doc.id, ...doc.data() });
     });
 
-    console.log(_places);
-
     return _places;
   }
 
