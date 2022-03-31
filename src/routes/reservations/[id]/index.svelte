@@ -54,13 +54,27 @@
   {:then reservation}
     {#if reservation}
       <section class="mt-8 gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
-        <ReservationStat
-          label="Direction"
-          value={getDirectionText(String(reservation.direction))}
-        />
-        <ReservationStat label="Fare type" value={getFareTypeText(String(reservation.fareType))} />
-        <ReservationStat label="Passengers" value={reservation.passengers} />
-        <ReservationStat label="Luggage" value={reservation.luggage} />
+        <div>
+          <ReservationStat label="Airport" value={reservation.placeName} />
+        </div>
+        <div>
+          <ReservationStat
+            label="Direction"
+            value={getDirectionText(String(reservation.direction))}
+          />
+        </div>
+        <div>
+          <ReservationStat
+            label="Fare type"
+            value={getFareTypeText(String(reservation.fareType))}
+          />
+        </div>
+        <div>
+          <ReservationStat label="Passengers" value={reservation.passengers} />
+        </div>
+        <div>
+          <ReservationStat label="Luggage" value={reservation.luggage} />
+        </div>
       </section>
     {/if}
   {:catch}
