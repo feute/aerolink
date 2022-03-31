@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
   import { addDoc, collection, getDocs, query, serverTimestamp } from 'firebase/firestore';
   import { firestore } from '$lib/firebase';
 
@@ -52,6 +53,8 @@
       address,
       createdAt: serverTimestamp(),
     });
+
+    goto(`/reservations/${reservationRef.id}`);
   }
 
   onMount(() => {
