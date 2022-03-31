@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
+  import { tweened } from 'svelte/motion';
+  import { cubicOut } from 'svelte/easing';
+  import { fly, fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { addDoc, collection, getDocs, query, serverTimestamp } from 'firebase/firestore';
   import { firestore } from '$lib/firebase';
@@ -9,7 +12,7 @@
   // Form inputs.
   let direction = 'from';
   let fareType = 'one-way';
-  let placeId = '';
+  let selectedPlace: any = '';
   let address = '';
   let flightNumber = '';
   let luggage = 0;
@@ -17,6 +20,26 @@
   let firstName = '';
   let lastName = '';
   let phoneNumber = '';
+  let totalCost = tweened(0, {
+    duration: 200,
+    easing: cubicOut,
+  });
+
+  $: if (selectedPlace && fareType) {
+    getTotalCost();
+  }
+
+  function getTotalCost() {
+    if (!selectedPlace || !fareType) {
+      totalCost.set(0);
+    }
+
+    if (fareType === 'round-trip') {
+      totalCost.set(selectedPlace.price * 2);
+    } else {
+      totalCost.set(selectedPlace.price);
+    }
+  }
 
   async function getPlaces() {
     const q = query(collection(firestore, 'places'));
@@ -35,10 +58,15 @@
   }
 
   async function handleSubmit() {
+    if (!selectedPlace) {
+      return;
+    }
+
     const reservationRef = await addDoc(collection(firestore, 'reservations'), {
       direction,
       fareType,
-      placeId,
+      placeId: selectedPlace.id,
+      placeName: selectedPlace.name,
       passengers,
       luggage,
       firstName,
@@ -225,14 +253,14 @@
       <section class="mt-3 sm:flex sm:space-x-4">
         <section class="w-full">
           <label for="place-select" class="mb-1 block">Select airport</label>
-          <select required id="place-select" value={placeId}>
+          <select required id="place-select" bind:value={selectedPlace}>
             {#await places}
               <option value="">Loading...</option>
             {:then result}
               <option value=""> Select airport </option>
               {#if result}
                 {#each result as place (place.id)}
-                  <option value={place.id}>
+                  <option value={place}>
                     {place.name}
                     {#if place.code}
                       ({place.code})
@@ -300,6 +328,16 @@
         <label for="phone-number" class="mb-1 block">Phone number</label>
         <input type="tel" name="phone-number" id="phone-number" bind:value={phoneNumber} required />
       </section>
+
+      {#if selectedPlace}
+        <p
+          in:fly={{ y: 3, duration: 200 }}
+          out:fly={{ y: 3, duration: 100 }}
+          class="mt-4 font-semibold text-gray-600"
+        >
+          Total: ${Math.floor($totalCost)}
+        </p>
+      {/if}
 
       <section class="mt-3">
         <button type="submit" class="btn btn--primary px-5 py-2 text-base">Book now</button>
