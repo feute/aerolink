@@ -34,11 +34,10 @@
   }
 
   async function handleSubmit() {
-    await addDoc(collection(firestore, 'reservations'), {
+    const reservationRef = await addDoc(collection(firestore, 'reservations'), {
       direction,
       fareType,
       placeId,
-      address,
       passengers,
       luggage,
       firstName,
@@ -48,7 +47,11 @@
       createdAt: serverTimestamp(),
     });
 
-    alert('Saved');
+    await addDoc(collection(firestore, 'reservationsPrivate'), {
+      reservationId: reservationRef.id,
+      address,
+      createdAt: serverTimestamp(),
+    });
   }
 
   onMount(() => {
