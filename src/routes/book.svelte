@@ -65,14 +65,14 @@
 
   <p class="mt-4 text-center text-base font-medium text-slate-600">
     Traveling within a group? On your own? We offer safe and reliable airport and city-to-city
-    transfers, as well as rides to touristic points of interest. We’ve got options to fit your
+    transfers, as well as rides to touristic points of interest. We've got options to fit your
     budget and travel plans.
   </p>
 
   <p class="mt-2 text-center text-base font-medium text-slate-600">
     Having no airport of its own, we understand that finding a way to get to San Miguel de Allende
-    from one of the city's neighboring airports can be hectic. With AerolinkSMA's non-stop service,
-    you’ll have the comfort and peace of mind of a guaranteed, safe and reliable ride.
+    from one of the city's neighboring airports can be hectic. With Aerolink's non-stop service,
+    you'll have the comfort and peace of mind of a guaranteed, safe and reliable ride.
   </p>
 </section>
 
