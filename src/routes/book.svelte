@@ -65,6 +65,7 @@
       fareType,
       placeId: selectedPlace.id,
       placeName: selectedPlace.name,
+      placeIsAirport: selectedPlace.isAirport || true,
       passengers,
       luggage,
       firstName,
