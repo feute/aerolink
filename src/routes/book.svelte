@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import { tweened } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
-  import { fly, fade } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { addDoc, collection, getDocs, query, serverTimestamp } from 'firebase/firestore';
   import { firestore } from '$lib/firebase';
