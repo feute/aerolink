@@ -55,9 +55,8 @@
       </div>
       <div class="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
         {#if authState.user}
-          <button
-            type="button"
-            on:click={logOut}
+          <a
+            href="/profile"
             class="flex items-center justify-center space-x-1 rounded-full bg-slate-50 py-2 px-3 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-100 hover:shadow hover:ring-slate-300"
           >
             <svg
@@ -77,7 +76,7 @@
                 {authState.user.displayName.split(' ')[0]}
               {/if}
             </span>
-          </button>
+          </a>
         {:else}
           <a
             href="#"
