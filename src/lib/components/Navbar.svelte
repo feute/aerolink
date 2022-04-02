@@ -1,5 +1,19 @@
-<script>
+<script lang="ts">
   import logo from '$lib/assets/logo.png';
+  import { signOut } from 'firebase/auth';
+  import { auth } from '$lib/firebase';
+  import { authStore } from '$lib/stores/auth';
+  import type { TAuthStore } from '$lib/stores/auth';
+
+  let authState: TAuthStore;
+
+  authStore.subscribe((value) => {
+    authState = value;
+  });
+
+  function logOut() {
+    signOut(auth);
+  }
 </script>
 
 <!-- This example requires Tailwind CSS v2.0+ -->
@@ -40,13 +54,39 @@
         </button>
       </div>
       <div class="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
-        <a
-          href="#"
-          class="whitespace-nowrap text-sm font-semibold text-slate-500 hover:text-slate-900"
-        >
-          Sign in
-        </a>
-        <a href="#" class="btn btn--primary ml-8"> Sign up </a>
+        {#if authState.user}
+          <button
+            type="button"
+            on:click={logOut}
+            class="flex items-center justify-center space-x-1 rounded-full bg-slate-50 py-2 px-3 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-100 hover:shadow hover:ring-slate-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              class="h-4 w-4"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"
+              />
+            </svg>
+            <span>
+              {#if authState.user.isAnonymous}
+                Guest
+              {:else}
+                {authState.user.displayName.split(' ')[0]}
+              {/if}
+            </span>
+          </button>
+        {:else}
+          <a
+            href="#"
+            class="whitespace-nowrap text-sm font-semibold text-slate-500 hover:text-slate-900"
+          >
+            Sign in
+          </a>
+          <a href="#" class="btn btn--primary ml-8"> Sign up </a>
+        {/if}
       </div>
     </div>
   </div>

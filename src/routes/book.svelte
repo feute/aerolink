@@ -4,10 +4,14 @@
   import { cubicOut } from 'svelte/easing';
   import { fly } from 'svelte/transition';
   import { goto } from '$app/navigation';
+  import { signInAnonymously } from 'firebase/auth';
   import { addDoc, collection, getDocs, query, serverTimestamp } from 'firebase/firestore';
-  import { firestore } from '$lib/firebase';
+  import { authStore } from '$lib/stores/auth';
+  import { auth, firestore } from '$lib/firebase';
+  import type { User, UserCredential } from 'firebase/auth';
 
   let places: any;
+  let user: User;
 
   // Form inputs.
   let direction = 'from';
@@ -23,6 +27,10 @@
   let totalCost = tweened(0, {
     duration: 200,
     easing: cubicOut,
+  });
+
+  authStore.subscribe((value) => {
+    user = value.user;
   });
 
   $: if (selectedPlace && fareType) {
@@ -56,13 +64,28 @@
   }
 
   async function handleSubmit() {
+    let _user: User = user;
+
     if (!selectedPlace) {
       return;
     }
 
+    if (!_user) {
+      const userCredential = await signInAnonymously(auth);
+      _user = userCredential.user;
+    }
+
+    let priceId = selectedPlace.oneWayPriceId;
+
+    if (fareType === 'round-trip') {
+      priceId = selectedPlace.roundTripPriceId;
+    }
+
     const reservationRef = await addDoc(collection(firestore, 'reservations'), {
+      userId: _user.uid,
       direction,
       fareType,
+      priceId,
       placeId: selectedPlace.id,
       placeName: selectedPlace.name,
       placeIsAirport: selectedPlace.isAirport || true,
@@ -72,10 +95,12 @@
       lastName,
       phoneNumber,
       flightNumber,
+      totalCost: $totalCost,
       createdAt: serverTimestamp(),
     });
 
     await addDoc(collection(firestore, 'reservationsPrivate'), {
+      userId: _user.uid,
       reservationId: reservationRef.id,
       address,
       createdAt: serverTimestamp(),
