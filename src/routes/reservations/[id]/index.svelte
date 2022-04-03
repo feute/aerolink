@@ -1,5 +1,6 @@
 <script lang="ts">
   import dayjs from 'dayjs/esm';
+  import dayjsUTC from 'dayjs/esm/plugin/utc';
   import dayjsTz from 'dayjs/esm/plugin/timezone';
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';
@@ -9,8 +10,6 @@
   import ReservationStat from '$lib/components/ReservationStat.svelte';
   import type { User } from 'firebase/auth';
   import type { Unsubscribe } from 'firebase/firestore';
-
-  dayjs.extend(dayjsTz);
 
   const TIMEZONE = 'America/Mexico_City';
 
@@ -90,6 +89,9 @@
   }
 
   onMount(() => {
+    dayjs.extend(dayjsUTC);
+    dayjs.extend(dayjsTz);
+
     getReservation();
   });
 

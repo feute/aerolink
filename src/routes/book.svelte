@@ -1,6 +1,7 @@
 <script lang="ts">
   import 'flatpickr/dist/flatpickr.css';
   import dayjs from 'dayjs/esm';
+  import dayjsUTC from 'dayjs/esm/plugin/utc';
   import dayjsTz from 'dayjs/esm/plugin/timezone';
   import Flatpickr from 'svelte-flatpickr';
   import { onMount } from 'svelte';
@@ -20,14 +21,12 @@
   import { authStore } from '$lib/stores/auth';
   import { auth, firestore } from '$lib/firebase';
   import type { User, UserCredential } from 'firebase/auth';
-
-  dayjs.extend(dayjsTz);
-
-  dayjs.tz.setDefault('America/Mexico_City');
+  import type { Dayjs } from 'dayjs';
+  import type { Options } from 'flatpickr/dist/types/options';
 
   const TIMEZONE = 'America/Mexico_City';
 
-  let minDate = dayjs(localDate()).add(6, 'hours');
+  let minDate: Dayjs;
 
   let error = '';
   let places: any;
@@ -44,24 +43,24 @@
   let firstName = '';
   let lastName = '';
   let phoneNumber = '';
-  let pickupTime = minDate.toDate();
-  let returnTime = minDate.add(1, 'hours').toDate();
+  let pickupTime: Date;
+  let returnTime: Date;
 
   let totalCost = tweened(0, {
     duration: 200,
     easing: cubicOut,
   });
-  let pickupDateOptions = {
+  let pickupDateOptions: Partial<Options> = {
     enableTime: true,
     altInput: true,
     altFormat: 'F j, h:i K',
-    minDate: minDate.toDate(),
+    // minDate: minDate.toDate(),
   };
-  let returnDateOptions = {
+  let returnDateOptions: Partial<Options> = {
     enableTime: true,
     altInput: true,
     altFormat: 'F j, h:i K',
-    minDate: minDate.add(1, 'hours').toDate(),
+    // minDate: minDate.add(1, 'hours').toDate(),
   };
 
   authStore.subscribe((value) => {
@@ -199,6 +198,16 @@
   }
 
   onMount(() => {
+    dayjs.extend(dayjsUTC);
+    dayjs.extend(dayjsTz);
+
+    dayjs.tz.setDefault('America/Mexico_City');
+
+    minDate = dayjs(localDate()).add(6, 'hours');
+    pickupTime = minDate.toDate();
+    returnTime = minDate.add(1, 'hours').toDate();
+    pickupDateOptions.minDate = minDate.toDate();
+    returnDateOptions.minDate = minDate.add(1, 'hours').toDate();
     places = getPlaces();
   });
 </script>
