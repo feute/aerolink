@@ -1,8 +1,8 @@
 <script lang="ts">
   import 'flatpickr/dist/flatpickr.css';
-  import dayjs from 'dayjs/esm';
-  import dayjsUTC from 'dayjs/esm/plugin/utc';
-  import dayjsTz from 'dayjs/esm/plugin/timezone';
+  import dayjs from 'dayjs/esm/index.js';
+  import dayjsUTC from 'dayjs/esm/plugin/utc/index.js';
+  import dayjsTz from 'dayjs/esm/plugin/timezone/index.js';
   import Flatpickr from 'svelte-flatpickr';
   import { onMount } from 'svelte';
   import { tweened } from 'svelte/motion';
