@@ -1,7 +1,7 @@
 <script lang="ts">
-  import dayjs from 'dayjs/esm/index.js';
-  import dayjsUTC from 'dayjs/esm/plugin/utc/index.js';
-  import dayjsTz from 'dayjs/esm/plugin/timezone/index.js';
+  import dayjs from 'dayjs';
+  import dayjsUTC from 'dayjs/plugin/utc.js';
+  import dayjsTz from 'dayjs/plugin/timezone.js';
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';
   import { addDoc, collection, doc, getDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
