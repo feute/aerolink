@@ -1,15 +1,35 @@
 <script lang="ts">
+  import 'flatpickr/dist/flatpickr.css';
+  import dayjs from 'dayjs/esm';
+  import dayjsTz from 'dayjs/esm/plugin/timezone';
+  import Flatpickr from 'svelte-flatpickr';
   import { onMount } from 'svelte';
   import { tweened } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
   import { fly } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { signInAnonymously } from 'firebase/auth';
-  import { addDoc, collection, getDocs, query, serverTimestamp } from 'firebase/firestore';
+  import {
+    addDoc,
+    collection,
+    getDocs,
+    query,
+    serverTimestamp,
+    Timestamp,
+  } from 'firebase/firestore';
   import { authStore } from '$lib/stores/auth';
   import { auth, firestore } from '$lib/firebase';
   import type { User, UserCredential } from 'firebase/auth';
 
+  dayjs.extend(dayjsTz);
+
+  dayjs.tz.setDefault('America/Mexico_City');
+
+  const TIMEZONE = 'America/Mexico_City';
+
+  let minDate = dayjs(localDate()).add(6, 'hours');
+
+  let error = '';
   let places: any;
   let user: User;
 
@@ -24,10 +44,25 @@
   let firstName = '';
   let lastName = '';
   let phoneNumber = '';
+  let pickupTime = minDate.toDate();
+  let returnTime = minDate.add(1, 'hours').toDate();
+
   let totalCost = tweened(0, {
     duration: 200,
     easing: cubicOut,
   });
+  let pickupDateOptions = {
+    enableTime: true,
+    altInput: true,
+    altFormat: 'F j, h:i K',
+    minDate: minDate.toDate(),
+  };
+  let returnDateOptions = {
+    enableTime: true,
+    altInput: true,
+    altFormat: 'F j, h:i K',
+    minDate: minDate.add(1, 'hours').toDate(),
+  };
 
   authStore.subscribe((value) => {
     user = value.user;
@@ -35,6 +70,34 @@
 
   $: if (selectedPlace && fareType) {
     getTotalCost();
+  }
+
+  function localDate() {
+    let mxnDate = dayjs().tz(TIMEZONE);
+    let dateTime = dayjs()
+      .set('date', mxnDate.get('date'))
+      .set('year', mxnDate.get('year'))
+      .set('month', mxnDate.get('month'))
+      .set('day', mxnDate.get('day'))
+      .set('hour', mxnDate.get('hour'))
+      .set('minute', mxnDate.get('minute'))
+      .toDate();
+
+    return dateTime;
+  }
+
+  function transformToMexicoTimezone(date: Date) {
+    let _date = dayjs(date);
+    let newDate = dayjs(date)
+      .tz(TIMEZONE)
+      .set('date', _date.get('date'))
+      .set('year', _date.get('year'))
+      .set('month', _date.get('month'))
+      .set('day', _date.get('day'))
+      .set('hour', _date.get('hour'))
+      .set('minute', _date.get('minute'));
+
+    return newDate;
   }
 
   function getTotalCost() {
@@ -64,6 +127,8 @@
   }
 
   async function handleSubmit() {
+    error = '';
+
     let _user: User = user;
 
     if (!selectedPlace) {
@@ -81,6 +146,28 @@
       priceId = selectedPlace.roundTripPriceId;
     }
 
+    let _minDate = dayjs(localDate()).add(5, 'hours').add(50, 'minutes');
+
+    if (!pickupTime || _minDate.isAfter(pickupTime)) {
+      error = 'You must set a new pickup time';
+      minDate = dayjs(localDate()).add(6, 'hours');
+      return;
+    }
+
+    let _returnTime;
+
+    if (fareType === 'round-trip') {
+      if (!returnTime || _minDate.isAfter(returnTime)) {
+        error = 'You must set a new return time';
+        minDate = dayjs(localDate()).add(6, 'hours');
+        return;
+      }
+
+      _returnTime = transformToMexicoTimezone(returnTime).valueOf();
+    }
+
+    let _pickupTime = transformToMexicoTimezone(pickupTime).valueOf();
+
     const reservationRef = await addDoc(collection(firestore, 'reservations'), {
       userId: _user.uid,
       direction,
@@ -96,6 +183,8 @@
       phoneNumber,
       flightNumber,
       totalCost: $totalCost,
+      pickupTime: Timestamp.fromMillis(_pickupTime),
+      returnTime: _returnTime ? Timestamp.fromMillis(_returnTime) : null,
       createdAt: serverTimestamp(),
     });
 
@@ -332,6 +421,19 @@
         </section>
       </section>
 
+      <section class="mt-3 sm:flex sm:space-x-4">
+        <section class="w-full">
+          <label for="passengers" class="mb-1 block">Pickup time</label>
+          <Flatpickr options={pickupDateOptions} bind:value={pickupTime} />
+        </section>
+        {#if fareType === 'round-trip'}
+          <section class="mt-3 w-full sm:mt-0">
+            <label for="luggage" class="mb-1 block">Return time</label>
+            <Flatpickr options={returnDateOptions} bind:value={returnTime} />
+          </section>
+        {/if}
+      </section>
+
       <div class="mt-4 flex items-center space-x-2">
         <h5 class="text-lg font-semibold text-slate-600">Personal information</h5>
         <hr class="grow border-slate-300" />
@@ -361,6 +463,14 @@
         >
           Total: ${Math.floor($totalCost)}
         </p>
+      {/if}
+
+      {#if error}
+        <section
+          class="my-4 rounded-md border border-red-200 bg-red-100 px-3 py-2 text-sm font-semibold text-red-800"
+        >
+          {error}
+        </section>
       {/if}
 
       <section class="mt-3">

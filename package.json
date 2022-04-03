@@ -43,6 +43,8 @@
     "*.{js,ts,cjs,svelte,json,html,css,md}": "prettier --write"
   },
   "dependencies": {
-    "firebase": "^9.6.10"
+    "dayjs": "^1.11.0",
+    "firebase": "^9.6.10",
+    "svelte-flatpickr": "^3.2.6"
   }
 }

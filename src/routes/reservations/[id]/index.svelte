@@ -1,4 +1,6 @@
 <script lang="ts">
+  import dayjs from 'dayjs/esm';
+  import dayjsTz from 'dayjs/esm/plugin/timezone';
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';
   import { addDoc, collection, doc, getDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
@@ -7,6 +9,10 @@
   import ReservationStat from '$lib/components/ReservationStat.svelte';
   import type { User } from 'firebase/auth';
   import type { Unsubscribe } from 'firebase/firestore';
+
+  dayjs.extend(dayjsTz);
+
+  const TIMEZONE = 'America/Mexico_City';
 
   let user: User;
   let loading = true;
@@ -171,6 +177,28 @@
           <div><ReservationStat label="Passengers" value={reservationData.passengers} /></div>
           <div><ReservationStat label="Luggage" value={reservationData.luggage} /></div>
           <div><ReservationStat label="Cost" value={`$${reservationData.totalCost}`} /></div>
+          {#if reservationData.pickupTime}
+            <div>
+              <ReservationStat
+                label="Pickup time"
+                value={dayjs
+                  .unix(reservationData.pickupTime.seconds)
+                  .tz(TIMEZONE)
+                  .format('MMM D, h:mm a')}
+              />
+            </div>
+          {/if}
+          {#if reservationData.returnTime}
+            <div>
+              <ReservationStat
+                label="Return time"
+                value={dayjs
+                  .unix(reservationData.returnTime.seconds)
+                  .tz(TIMEZONE)
+                  .format('MMM D, h:mm a')}
+              />
+            </div>
+          {/if}
         </section>
 
         {#if !reservationData.paid}
