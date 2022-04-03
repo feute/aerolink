@@ -5,6 +5,7 @@
   import { authStore } from '$lib/stores/auth';
   import { signOut } from 'firebase/auth';
   import { auth } from '$lib/firebase';
+  import ReservationItem from '$lib/components/ReservationItem.svelte';
 
   // Redirect back to home if unauthenticated.
   $: if (!$authStore.isLoading && !$authStore.user) {
@@ -74,23 +75,7 @@
           {#if reservations}
             <section class="flex flex-col space-y-2">
               {#each reservations as reservation (reservation.id)}
-                <a
-                  href={`/reservations/${reservation.id}`}
-                  class="px-3 py-2 md:px-4 md:py-3 md:flex md:justify-between group border border-slate-200 rounded-md shadow-sm hover:shadow transition"
-                >
-                  <p class="text-sm font-medium">ID: {reservation.id}</p>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    class="w-5 h-5 hidden md:group-hover:block text-slate-400"
-                    viewBox="0 0 16 16"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
-                    />
-                  </svg>
-                </a>
+                <ReservationItem {reservation} />
               {/each}
             </section>
           {/if}
