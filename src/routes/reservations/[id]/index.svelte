@@ -239,6 +239,9 @@
                 <div><ReservationStat label="Last name" value={privateData.lastName} /></div>
                 <div><ReservationStat label="Phone number" value={privateData.phoneNumber} /></div>
                 <div><ReservationStat label="Email" value={privateData.email} /></div>
+                <div class="col-span-2">
+                  <ReservationStat label="Address" value={privateData.address} />
+                </div>
               {/if}
             {/await}
           </section>
