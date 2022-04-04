@@ -1,8 +1,8 @@
 <script lang="ts">
   import dayjs from 'dayjs';
-  import dayjsUTC from 'dayjs/plugin/utc';
-  import dayjsTz from 'dayjs/plugin/timezone';
-  import dayjsRelativeTime from 'dayjs/plugin/relativeTime';
+  import dayjsUTC from 'dayjs/plugin/utc.js';
+  import dayjsTz from 'dayjs/plugin/timezone.js';
+  import dayjsRelativeTime from 'dayjs/plugin/relativeTime.js';
   import { onMount } from 'svelte';
   import { collection, getDocs, orderBy, query, limit } from 'firebase/firestore';
   import { goto } from '$app/navigation';
