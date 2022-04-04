@@ -177,9 +177,6 @@
       placeIsAirport: selectedPlace.isAirport || true,
       passengers,
       luggage,
-      firstName,
-      lastName,
-      phoneNumber,
       flightNumber,
       totalCost: $totalCost,
       pickupTime: Timestamp.fromMillis(_pickupTime),
@@ -191,6 +188,9 @@
       userId: _user.uid,
       reservationId: reservationRef.id,
       address,
+      phoneNumber,
+      firstName,
+      lastName,
       createdAt: serverTimestamp(),
     });
 
