@@ -80,19 +80,19 @@
             <span>
               {#if authState.user.isAnonymous}
                 Guest
-              {:else}
+              {:else if authState.user.displayName}
                 {authState.user.displayName.split(' ')[0]}
               {/if}
             </span>
           </a>
         {:else}
           <a
-            href="#"
-            class="whitespace-nowrap text-sm font-semibold text-slate-500 hover:text-slate-900"
+            href="/register"
+            class="rounded-md px-3 py-2 whitespace-nowrap text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
           >
-            Sign in
+            Register
           </a>
-          <a href="#" class="btn btn--primary ml-8"> Sign up </a>
+          <a href="/login" class="btn btn--primary ml-6">Sign in</a>
         {/if}
       </div>
     </div>
@@ -150,14 +150,14 @@
         <div class="grid grid-cols-2 gap-y-4 gap-x-8" />
         <div>
           <a
-            href="#"
+            href="/register"
             class="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
           >
-            Sign up
+            Register
           </a>
           <p class="mt-6 text-center text-base font-medium text-slate-500">
             Existing customer?
-            <a href="#" class="text-indigo-600 hover:text-indigo-500"> Sign in </a>
+            <a href="/login" class="text-indigo-600 hover:text-indigo-500"> Sign in </a>
           </p>
         </div>
       </div>
