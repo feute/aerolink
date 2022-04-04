@@ -81,7 +81,7 @@
   }
 
   async function createCheckoutSession() {
-    if (!reservationData || !reservationData) {
+    if (!reservationData || !reservationData || !$authStore.user) {
       return;
     }
 
@@ -244,7 +244,7 @@
           </section>
         {/if}
 
-        {#if !reservationData.paid}
+        {#if !reservationData.paid && $authStore.user}
           <section class="mt-8 sm:mt-10">
             <section class="mt-2 flex flex-col items-center">
               <button
