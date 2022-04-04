@@ -5,6 +5,7 @@
   import { auth } from '$lib/firebase';
   import { authStore } from '$lib/stores/auth';
   import Navbar from '$lib/components/Navbar.svelte';
+  import Footer from '$lib/components/Footer.svelte';
 
   onMount(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -23,6 +24,12 @@
   });
 </script>
 
-<Navbar />
+<section class="flex min-h-screen flex-col">
+  <Navbar />
 
-<slot />
+  <section class="grow">
+    <slot />
+  </section>
+
+  <Footer />
+</section>
