@@ -18,11 +18,23 @@
           {#if $authStore.isAdmin}
             <a
               href="/reservations"
-              class="rounded-md px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-700"
+              class="ml-3 rounded-md px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-700"
             >
               Reservations
             </a>
           {/if}
+          <a
+            href="/faqs"
+            class="ml-3 hidden rounded-md px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-700 md:inline"
+          >
+            FAQs
+          </a>
+          <a
+            href="/terms"
+            class="ml-3 hidden rounded-md px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-700 md:inline"
+          >
+            Terms and Conditions
+          </a>
         </nav>
       </div>
       <div class="-my-2 -mr-2 md:hidden">
