@@ -43,6 +43,7 @@
   let firstName = '';
   let lastName = '';
   let phoneNumber = '';
+  let email = $authStore.user ? $authStore.user.email : '';
   let pickupTime: Date;
   let returnTime: Date;
 
@@ -191,6 +192,7 @@
       phoneNumber,
       firstName,
       lastName,
+      email,
       createdAt: serverTimestamp(),
     });
 
@@ -459,9 +461,21 @@
         </section>
       </section>
 
-      <section class="mt-3">
-        <label for="phone-number" class="mb-1 block">Phone number</label>
-        <input type="tel" name="phone-number" id="phone-number" bind:value={phoneNumber} required />
+      <section class="mt-3 sm:flex sm:space-x-4">
+        <section class="w-full">
+          <label for="phone-number" class="mb-1 block">Phone number</label>
+          <input
+            type="tel"
+            name="phone-number"
+            id="phone-number"
+            bind:value={phoneNumber}
+            required
+          />
+        </section>
+        <section class="mt-3 w-full sm:mt-0">
+          <label for="email" class="mb-1 block">Email</label>
+          <input type="email" name="email" id="email" bind:value={email} required />
+        </section>
       </section>
 
       {#if selectedPlace}
