@@ -4,7 +4,17 @@
   import dayjsTz from 'dayjs/plugin/timezone.js';
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';
-  import { addDoc, collection, doc, onSnapshot, serverTimestamp } from 'firebase/firestore';
+  import {
+    addDoc,
+    collection,
+    doc,
+    getDocs,
+    onSnapshot,
+    query,
+    where,
+    limit,
+    serverTimestamp,
+  } from 'firebase/firestore';
   import { firestore } from '$lib/firebase';
   import { authStore } from '$lib/stores/auth';
   import ReservationStat from '$lib/components/ReservationStat.svelte';
@@ -16,6 +26,7 @@
   let loadingCheckout = false;
   let reservationData: any;
   let reservationUnsubscribe: any;
+  let reservationPrivatePromise: any;
   let paymentSession: any;
   let paymentSessionUnsubscribe: Unsubscribe;
 
@@ -23,6 +34,10 @@
     if (paymentSession.url) {
       window.location.assign(String(paymentSession.url));
     }
+  }
+
+  $: if (reservationData && reservationData.id && $authStore.isAdmin) {
+    reservationPrivatePromise = getReservationPrivate(reservationData.id);
   }
 
   function getDirectionText(str: string) {
@@ -46,6 +61,23 @@
       reservationData = { id: doc.id, ...doc.data() };
       loading = false;
     });
+  }
+
+  async function getReservationPrivate(reservationId: string) {
+    const q = query(
+      collection(firestore, 'reservationsPrivate'),
+      where('reservationId', '==', reservationId),
+      limit(1)
+    );
+    const snap = await getDocs(q);
+
+    let _data;
+
+    snap.forEach((doc) => {
+      _data = { id: doc.id, ...doc.data() };
+    });
+
+    return _data;
   }
 
   async function createCheckoutSession() {
@@ -199,6 +231,17 @@
             </div>
           {/if}
         </section>
+        {#if reservationPrivatePromise}
+          <section class="mt-4 gap-4 grid grid-cols-2 sm:grid-cols-3">
+            {#await reservationPrivatePromise then privateData}
+              {#if privateData}
+                <div><ReservationStat label="First name" value={privateData.firstName} /></div>
+                <div><ReservationStat label="Last name" value={privateData.lastName} /></div>
+                <div><ReservationStat label="Phone number" value={privateData.phoneNumber} /></div>
+              {/if}
+            {/await}
+          </section>
+        {/if}
 
         {#if !reservationData.paid}
           <section class="mt-8 sm:mt-10">
