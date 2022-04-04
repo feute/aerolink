@@ -15,12 +15,14 @@
           <img class="h-8 w-auto sm:h-10" src={logo} alt="Logo" />
         </a>
         <nav class="ml-10 flex items-center">
-          <a
-            href="/reservations"
-            class="rounded-md px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-700"
-          >
-            Reservations
-          </a>
+          {#if $authStore.isAdmin}
+            <a
+              href="/reservations"
+              class="rounded-md px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-700"
+            >
+              Reservations
+            </a>
+          {/if}
         </nav>
       </div>
       <div class="-my-2 -mr-2 md:hidden">
