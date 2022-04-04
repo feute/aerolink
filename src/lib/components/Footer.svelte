@@ -1,6 +1,13 @@
+<script>
+  import logo from '$lib/assets/logo.png';
+</script>
+
 <footer class="mt-10 border-t border-slate-300 bg-slate-100 px-4 py-8 sm:mt-14 sm:py-12">
   <section class="mx-auto flex max-w-4xl flex-wrap space-x-10 sm:space-x-20 md:space-x-32">
     <section>
+      <div class="mb-4 ">
+        <img class="h-8 w-auto sm:h-10" src={logo} alt="Logo" />
+      </div>
       <p class="font-semibold text-slate-700">&copy; Aerolink 2022</p>
       <p class="mt-6 flex items-center space-x-2 text-sm font-semibold text-slate-600">
         <svg
