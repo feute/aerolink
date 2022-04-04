@@ -1,10 +1,24 @@
 <script lang="ts">
+  import dayjs from 'dayjs';
+  import dayjsUTC from 'dayjs/plugin/utc';
+  import dayjsTz from 'dayjs/plugin/timezone';
+  import dayjsRelativeTime from 'dayjs/plugin/relativeTime';
+  import { onMount } from 'svelte';
   import { collection, getDocs, orderBy, query, limit } from 'firebase/firestore';
   import { goto } from '$app/navigation';
   import { firestore } from '$lib/firebase';
   import { authStore } from '$lib/stores/auth';
   import ReservationItem from '$lib/components/ReservationItem.svelte';
   import type { User } from 'firebase/auth';
+
+  const TIMEZONE = 'America/Mexico_City';
+
+  onMount(() => {
+    dayjs.extend(dayjsUTC);
+    dayjs.extend(dayjsTz);
+    dayjs.extend(dayjsRelativeTime);
+    dayjs.tz.setDefault(TIMEZONE);
+  });
 
   // Redirect back to home if unauthenticated.
   $: if (!$authStore.isLoading && !$authStore.user) {
@@ -76,7 +90,11 @@
           {#if reservations}
             <section class="flex flex-col space-y-2">
               {#each reservations as reservation (reservation.id)}
-                <ReservationItem {reservation} showPickupTime showTotal />
+                <ReservationItem
+                  {reservation}
+                  showTotal
+                  timestamp={dayjs.unix(reservation.pickupTime.seconds).tz(TIMEZONE).fromNow()}
+                />
               {/each}
             </section>
           {/if}
@@ -96,7 +114,11 @@
         {#if reservations}
           <section class="flex flex-col space-y-2">
             {#each reservations as reservation (reservation.id)}
-              <ReservationItem {reservation} showTimestamp showTotal />
+              <ReservationItem
+                {reservation}
+                showTotal
+                timestamp={dayjs.unix(reservation.createdAt.seconds).tz(TIMEZONE).fromNow()}
+              />
             {/each}
           </section>
         {/if}

@@ -1,16 +1,7 @@
 <script lang="ts">
   export let reservation;
-  export let showTimestamp = false;
-  export let showPickupTime = false;
   export let showTotal = false;
-
-  import dayjs from 'dayjs';
-  import dayjsUTC from 'dayjs/plugin/utc.js';
-  import dayjsTz from 'dayjs/plugin/timezone.js';
-  import dayjsRelativeTime from 'dayjs/plugin/relativeTime.js';
-  import { onMount } from 'svelte';
-
-  const TIMEZONE = 'America/Mexico_City';
+  export let timestamp = null;
 
   function getDirectionText(str: string) {
     if (str === 'to') {
@@ -27,14 +18,6 @@
       return 'Round trip';
     }
   }
-
-  onMount(() => {
-    dayjs.extend(dayjsUTC);
-    dayjs.extend(dayjsTz);
-    dayjs.extend(dayjsRelativeTime);
-
-    dayjs.tz.setDefault(TIMEZONE);
-  });
 </script>
 
 <a
@@ -44,13 +27,9 @@
   <section class="flex grow flex-col">
     <p class="text-sm font-semibold text-slate-700">ID: {reservation.id}</p>
     <section class="mt-1 flex flex-wrap items-center">
-      {#if showTimestamp}
+      {#if timestamp}
         <span class="mr-2 text-xs text-slate-500">
-          {dayjs.unix(reservation.createdAt.seconds).tz(TIMEZONE).fromNow()}
-        </span>
-      {:else if showPickupTime}
-        <span class="mr-2 text-xs text-slate-500">
-          {dayjs.unix(reservation.pickupTime.seconds).tz(TIMEZONE).fromNow()}
+          {timestamp}
         </span>
       {/if}
       <span
