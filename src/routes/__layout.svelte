@@ -8,12 +8,16 @@
 
   onMount(() => {
     onAuthStateChanged(auth, async (user) => {
-      const token = await user.getIdTokenResult();
+      let token;
+
+      if (user) {
+        token = await user.getIdTokenResult();
+      }
 
       authStore.set({
         user,
         isLoading: false,
-        isAdmin: Boolean(token.claims.admin),
+        isAdmin: token ? Boolean(token.claims.admin) : false,
       });
     });
   });
