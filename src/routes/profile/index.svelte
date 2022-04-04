@@ -41,10 +41,10 @@
   <title>Profile | Aerolink</title>
 </svelte:head>
 
-{#if $authStore.isLoading}
-  Loading
-{:else if $authStore.user}
-  <section class="my-8 px-3 max-w-7xl mx-auto flex flex-col md:flex-row space-y-3 md:space-y-0">
+<section class="my-8 mx-auto flex max-w-7xl flex-col space-y-3 px-3 md:flex-row md:space-y-0">
+  {#if $authStore.isLoading}
+    <p class="text-center text-sm text-slate-600">Loading...</p>
+  {:else if $authStore.user}
     <section class="md:ml-8 md:order-2 md:w-1/3">
       <section class="px-5 py-4 border border-slate-200 shadow-sm rounded-lg">
         <h5 class="text-xl font-bold">
@@ -84,5 +84,5 @@
         {/await}
       {/if}
     </section>
-  </section>
-{/if}
+  {/if}
+</section>

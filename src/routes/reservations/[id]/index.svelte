@@ -148,7 +148,7 @@
     </p>
 
     {#if loading}
-      Loading...
+      <p class="mt-8 text-center text-sm text-slate-600">Loading...</p>
     {:else if reservationData}
       <section class="mt-8">
         {#if !reservationData.paid}

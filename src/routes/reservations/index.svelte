@@ -81,8 +81,8 @@
 
 <section class="my-8 mx-auto flex max-w-7xl flex-col space-y-3 px-3 md:flex-row md:space-y-0">
   <section class="md:order-2 md:ml-8 md:w-2/5">
-    <section class="rounded-lg border border-slate-200 px-5 py-4 shadow-sm">
-      {#if nextRidesPromise}
+    {#if nextRidesPromise}
+      <section class="rounded-lg border border-slate-200 px-5 py-4 shadow-sm">
         <h5 class="mb-4 text-xl font-bold">Next rides</h5>
         {#await nextRidesPromise}
           <p class="text-slate-500">Loading...</p>
@@ -102,8 +102,8 @@
           <p>{error}</p>
           <p class="text-slate-500">Couldn't load your reservations.</p>
         {/await}
-      {/if}
-    </section>
+      </section>
+    {/if}
   </section>
   <section class="flex-grow rounded-lg md:order-1">
     {#if reservationsPromise}
