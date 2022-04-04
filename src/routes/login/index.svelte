@@ -24,9 +24,12 @@
     loading = true;
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdTokenResult();
+
       authStore.set({
         isLoading: false,
         user: userCredential.user,
+        isAdmin: Boolean(token.claims.admin),
       });
     } catch (err) {
       console.log(err);

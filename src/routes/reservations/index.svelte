@@ -4,10 +4,22 @@
   import { firestore } from '$lib/firebase';
   import { authStore } from '$lib/stores/auth';
   import ReservationItem from '$lib/components/ReservationItem.svelte';
+  import type { User } from 'firebase/auth';
 
   // Redirect back to home if unauthenticated.
   $: if (!$authStore.isLoading && !$authStore.user) {
     goto('/');
+  }
+
+  // Redirect back to home if user is not admin.
+  $: if ($authStore.user && !$authStore.isAdmin) {
+    goto('/');
+  }
+
+  async function getAdminStatus(user: User) {
+    const token = await user.getIdTokenResult();
+
+    return Boolean(token.claims.admin);
   }
 
   async function getReservations() {

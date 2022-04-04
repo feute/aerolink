@@ -36,8 +36,11 @@
     loading = true;
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdTokenResult();
+
       authStore.set({
         isLoading: false,
+        isAdmin: Boolean(token.claims.admin),
         user: {
           ...userCredential.user,
           displayName: fullName,

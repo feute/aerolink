@@ -7,10 +7,13 @@
   import Navbar from '$lib/components/Navbar.svelte';
 
   onMount(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
+      const token = await user.getIdTokenResult();
+
       authStore.set({
         user,
         isLoading: false,
+        isAdmin: Boolean(token.claims.admin),
       });
     });
   });
