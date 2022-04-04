@@ -81,7 +81,7 @@
   }
 
   async function createCheckoutSession() {
-    if (!reservationData || !reservationData || !$authStore.user) {
+    if (!reservationData || !$authStore.user) {
       return;
     }
 
