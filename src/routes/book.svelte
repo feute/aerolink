@@ -414,6 +414,7 @@
           <input
             type="number"
             min="1"
+            max="4"
             name="passengers"
             id="passengers"
             bind:value={passengers}
@@ -422,19 +423,27 @@
         </section>
         <section class="mt-3 w-full sm:mt-0">
           <label for="luggage" class="mb-1 block">Luggage</label>
-          <input type="number" min="0" name="luggage" id="luggage" bind:value={luggage} required />
+          <input
+            type="number"
+            min="0"
+            max="4"
+            name="luggage"
+            id="luggage"
+            bind:value={luggage}
+            required
+          />
         </section>
       </section>
 
       <section class="mt-3 sm:flex sm:space-x-4">
         <section class="w-full">
-          <label for="passengers" class="mb-1 block">Pickup time</label>
-          <Flatpickr options={pickupDateOptions} bind:value={pickupTime} />
+          <label for="pickupTime" class="mb-1 block">Pickup time</label>
+          <Flatpickr id="pickupTime" options={pickupDateOptions} bind:value={pickupTime} />
         </section>
         {#if fareType === 'round-trip'}
           <section class="mt-3 w-full sm:mt-0">
-            <label for="luggage" class="mb-1 block">Return time</label>
-            <Flatpickr options={returnDateOptions} bind:value={returnTime} />
+            <label for="returnTime" class="mb-1 block">Return time</label>
+            <Flatpickr id="returnTime" options={returnDateOptions} bind:value={returnTime} />
           </section>
         {/if}
       </section>
