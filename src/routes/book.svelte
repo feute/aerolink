@@ -20,7 +20,6 @@
   } from 'firebase/firestore';
   import { authStore } from '$lib/stores/auth';
   import { auth, firestore } from '$lib/firebase';
-  import type { User, UserCredential } from 'firebase/auth';
   import type { Dayjs } from 'dayjs';
   import type { Options } from 'flatpickr/dist/types/options';
 
@@ -30,7 +29,6 @@
 
   let error = '';
   let places: any;
-  let user: User;
 
   // Form inputs.
   let direction = 'from';
@@ -63,10 +61,6 @@
     altFormat: 'F j, h:i K',
     // minDate: minDate.add(1, 'hours').toDate(),
   };
-
-  authStore.subscribe((value) => {
-    user = value.user;
-  });
 
   $: if (selectedPlace && fareType) {
     getTotalCost();
@@ -129,7 +123,7 @@
   async function handleSubmit() {
     error = '';
 
-    let _user: User = user;
+    let _user = $authStore.user;
 
     if (!selectedPlace) {
       return;
@@ -215,7 +209,7 @@
 </script>
 
 <svelte:head>
-  <title>Book now</title>
+  <title>Book now | Aerolink</title>
 </svelte:head>
 
 <section class="mx-auto mt-8 max-w-3xl px-3">
