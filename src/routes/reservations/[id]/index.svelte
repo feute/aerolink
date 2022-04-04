@@ -4,26 +4,20 @@
   import dayjsTz from 'dayjs/plugin/timezone.js';
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';
-  import { addDoc, collection, doc, getDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
+  import { addDoc, collection, doc, onSnapshot, serverTimestamp } from 'firebase/firestore';
   import { firestore } from '$lib/firebase';
   import { authStore } from '$lib/stores/auth';
   import ReservationStat from '$lib/components/ReservationStat.svelte';
-  import type { User } from 'firebase/auth';
   import type { Unsubscribe } from 'firebase/firestore';
 
   const TIMEZONE = 'America/Mexico_City';
 
-  let user: User;
   let loading = true;
   let loadingCheckout = false;
   let reservationData: any;
   let reservationUnsubscribe: any;
   let paymentSession: any;
   let paymentSessionUnsubscribe: Unsubscribe;
-
-  authStore.subscribe((value) => {
-    user = value.user;
-  });
 
   $: if (paymentSession) {
     if (paymentSession.url) {
@@ -60,22 +54,25 @@
     }
 
     loadingCheckout = true;
-    const docRef = await addDoc(collection(firestore, 'customers', user.uid, 'checkout_sessions'), {
-      mode: 'payment',
-      price: reservationData.priceId, // One-time price created in Stripe
-      success_url: window.location.href,
-      cancel_url: window.location.href,
-      billing_address_collection: 'auto',
-      metadata: {
-        userId: user.uid,
-        placeId: reservationData?.placeId,
-        reservationId: reservationData?.id,
-      },
-      createdAt: serverTimestamp(),
-    });
+    const docRef = await addDoc(
+      collection(firestore, 'customers', $authStore.user.uid, 'checkout_sessions'),
+      {
+        mode: 'payment',
+        price: reservationData.priceId, // One-time price created in Stripe
+        success_url: window.location.href,
+        cancel_url: window.location.href,
+        billing_address_collection: 'auto',
+        metadata: {
+          userId: $authStore.user.uid,
+          placeId: reservationData?.placeId,
+          reservationId: reservationData?.id,
+        },
+        createdAt: serverTimestamp(),
+      }
+    );
 
     paymentSessionUnsubscribe = onSnapshot(
-      doc(firestore, 'customers', user.uid, 'checkout_sessions', docRef.id),
+      doc(firestore, 'customers', $authStore.user.uid, 'checkout_sessions', docRef.id),
       (doc) => {
         const data = doc.data();
 
