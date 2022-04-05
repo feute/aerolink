@@ -95,6 +95,8 @@
                   showTotal
                   timestamp={dayjs.unix(reservation.pickupTime.seconds).tz(TIMEZONE).fromNow()}
                 />
+              {:else}
+                <p class="text-sm font-semibold text-slate-500">No reservations.</p>
               {/each}
             </section>
           {/if}
@@ -119,6 +121,8 @@
                 showTotal
                 timestamp={dayjs.unix(reservation.createdAt.seconds).tz(TIMEZONE).fromNow()}
               />
+            {:else}
+              <p class="text-sm font-semibold text-slate-500">No reservations.</p>
             {/each}
           </section>
         {/if}

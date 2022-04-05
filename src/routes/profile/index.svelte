@@ -76,6 +76,8 @@
             <section class="flex flex-col space-y-2">
               {#each reservations as reservation (reservation.id)}
                 <ReservationItem {reservation} />
+              {:else}
+                <p class="text-slate-500">No reservations.</p>
               {/each}
             </section>
           {/if}
