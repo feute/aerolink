@@ -7,13 +7,14 @@ service cloud.firestore {
 
     match /reservations/{id} {
       allow get: if true;
-      allow list: if request.auth.token.admin == true;
+      allow list: if request.auth.uid == resource.data.userId || request.auth.token.admin == true;
       allow create: if request.auth.uid == request.resource.data.userId &&
         (!request.resource.data.keys().hasAny(['paid']));
     }
 
     match /reservationsPrivate/{id} {
       allow get: if request.auth.uid == resource.data.userId || request.auth.token.admin == true;
+      allow list: if request.auth.token.admin == true;
       allow create: if request.auth.uid == request.resource.data.userId
         && exists(/databases/$(database)/documents/reservations/$(request.resource.data.reservationId))
         && get(/databases/$(database)/documents/reservations/$(request.resource.data.reservationId)).data.userId == request.resource.data.userId;
