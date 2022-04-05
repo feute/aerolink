@@ -238,6 +238,11 @@
 </script>
 
 <svelte:head>
+  <meta
+    name="description"
+    content="Traveling within a group? On your own? We offer safe and reliable airport and city-to-city
+  transfers, as well as rides to touristic points of interest."
+  />
   <title>Book now | Aerolink</title>
 </svelte:head>
 
