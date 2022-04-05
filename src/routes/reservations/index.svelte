@@ -4,12 +4,13 @@
   import dayjsTz from 'dayjs/plugin/timezone.js';
   import dayjsRelativeTime from 'dayjs/plugin/relativeTime.js';
   import { onMount } from 'svelte';
-  import { collection, getDocs, orderBy, query, limit } from 'firebase/firestore';
+  import { fly } from 'svelte/transition';
+  import { collection, getDocs, orderBy, query, limit, where } from 'firebase/firestore';
   import { goto } from '$app/navigation';
   import { firestore } from '$lib/firebase';
   import { authStore } from '$lib/stores/auth';
   import ReservationItem from '$lib/components/ReservationItem.svelte';
-  import type { User } from 'firebase/auth';
+  import type { QueryConstraint } from 'firebase/firestore';
 
   const TIMEZONE = 'America/Mexico_City';
 
@@ -30,14 +31,16 @@
     goto('/');
   }
 
-  async function getAdminStatus(user: User) {
-    const token = await user.getIdTokenResult();
-
-    return Boolean(token.claims.admin);
-  }
+  let showUnconfirmed = false;
 
   async function getReservations() {
-    const q = query(collection(firestore, 'reservations'), orderBy('createdAt', 'desc'), limit(10));
+    let constraints: QueryConstraint[] = [orderBy('createdAt', 'desc'), limit(20)];
+
+    if (!showUnconfirmed) {
+      constraints.push(where('paid', '==', true));
+    }
+
+    const q = query(collection(firestore, 'reservations'), ...constraints);
     const snap = await getDocs(q);
 
     let _reservations: any[] = [];
@@ -56,7 +59,12 @@
   }
 
   async function getNextRides() {
-    const q = query(collection(firestore, 'reservations'), orderBy('pickupTime'), limit(10));
+    const q = query(
+      collection(firestore, 'reservations'),
+      where('paid', '==', true),
+      orderBy('pickupTime'),
+      limit(10)
+    );
     const snap = await getDocs(q);
 
     let _reservations: any[] = [];
@@ -93,6 +101,7 @@
                 <ReservationItem
                   {reservation}
                   showTotal
+                  showPaid
                   timestamp={dayjs.unix(reservation.pickupTime.seconds).tz(TIMEZONE).fromNow()}
                 />
               {:else}
@@ -100,8 +109,7 @@
               {/each}
             </section>
           {/if}
-        {:catch error}
-          <p>{error}</p>
+        {:catch}
           <p class="text-slate-500">Couldn't load your reservations.</p>
         {/await}
       </section>
@@ -110,6 +118,33 @@
   <section class="flex-grow rounded-lg md:order-1">
     {#if reservationsPromise}
       <h2 class="mb-4 text-2xl font-bold">Reservations</h2>
+      <section class="mb-4">
+        <span class="switch-unconfirmed-wrapper">
+          <input
+            type="checkbox"
+            id="switch-unconfirmed"
+            bind:checked={showUnconfirmed}
+            on:change={() => (reservationsPromise = getReservations())}
+            class="invisible absolute h-0 w-0"
+          />
+          <label for="switch-unconfirmed" class="switch-unconfirmed">
+            {#if showUnconfirmed}
+              <svg
+                transition:fly={{ x: -6, duration: 100 }}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                class="h-4 w-4 flex-shrink-0"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"
+                />
+              </svg>
+            {/if}
+            <span> Show unconfirmed reservations </span>
+          </label>
+        </span>
+      </section>
       {#await reservationsPromise}
         <p class="text-slate-500">Loading reservations.</p>
       {:then reservations}
@@ -119,6 +154,7 @@
               <ReservationItem
                 {reservation}
                 showTotal
+                showPaid
                 timestamp={dayjs.unix(reservation.createdAt.seconds).tz(TIMEZONE).fromNow()}
               />
             {:else}
@@ -132,3 +168,13 @@
     {/if}
   </section>
 </section>
+
+<style lang="postcss">
+  .switch-unconfirmed {
+    @apply inline-flex cursor-pointer items-center space-x-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-semibold text-slate-600 transition;
+  }
+
+  .switch-unconfirmed-wrapper input:checked + label {
+    @apply border-green-300 bg-green-200 text-green-800;
+  }
+</style>
