@@ -4,6 +4,7 @@
   import dayjsTz from 'dayjs/plugin/timezone.js';
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';
+  import { logEvent } from 'firebase/analytics';
   import {
     addDoc,
     collection,
@@ -15,7 +16,7 @@
     limit,
     serverTimestamp,
   } from 'firebase/firestore';
-  import { firestore } from '$lib/firebase';
+  import { analytics, firestore } from '$lib/firebase';
   import { authStore } from '$lib/stores/auth';
   import ReservationStat from '$lib/components/ReservationStat.svelte';
   import type { Unsubscribe } from 'firebase/firestore';
@@ -102,6 +103,19 @@
         createdAt: serverTimestamp(),
       }
     );
+
+    if (analytics) {
+      logEvent(analytics, 'begin_checkout', {
+        currency: 'USD',
+        value: Number(reservationData.totalCost),
+        items: [
+          {
+            item_id: String(reservationData.placeId),
+            item_name: `${reservationData.placeName} (${reservationData.fareType})`,
+          },
+        ],
+      });
+    }
 
     paymentSessionUnsubscribe = onSnapshot(
       doc(firestore, 'customers', $authStore.user.uid, 'checkout_sessions', docRef.id),

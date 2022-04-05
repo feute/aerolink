@@ -10,6 +10,7 @@
   import { fly } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { signInAnonymously } from 'firebase/auth';
+  import { logEvent, setUserId, setUserProperties } from 'firebase/analytics';
   import {
     addDoc,
     collection,
@@ -19,7 +20,7 @@
     Timestamp,
   } from 'firebase/firestore';
   import { authStore } from '$lib/stores/auth';
-  import { auth, firestore } from '$lib/firebase';
+  import { auth, firestore, analytics } from '$lib/firebase';
   import type { Dayjs } from 'dayjs';
   import type { Options } from 'flatpickr/dist/types/options';
 
@@ -132,6 +133,11 @@
     if (!_user) {
       const userCredential = await signInAnonymously(auth);
       _user = userCredential.user;
+
+      if (analytics) {
+        setUserId(analytics, _user.uid);
+        setUserProperties(analytics, { anonymous: true });
+      }
     }
 
     let priceId = selectedPlace.oneWayPriceId;
@@ -189,6 +195,13 @@
       email,
       createdAt: serverTimestamp(),
     });
+
+    if (analytics) {
+      logEvent(analytics, 'generate_lead', {
+        currency: 'USD',
+        value: $totalCost,
+      });
+    }
 
     goto(`/reservations/${reservationRef.id}`);
   }

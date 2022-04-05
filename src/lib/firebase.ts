@@ -1,7 +1,8 @@
 import { browser, dev } from '$app/env';
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getAnalytics } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 const firebaseConfig = {
@@ -14,9 +15,12 @@ const firebaseConfig = {
   measurementId: String(import.meta.env.VITE_FIREBASE_MEASUREMENT_ID),
 };
 
-export const app = initializeApp(firebaseConfig);
+const apps = getApps();
+
+export const app = apps.length > 0 ? apps[0] : initializeApp(firebaseConfig);
 export const firestore = getFirestore(app);
 export const auth = getAuth(app);
+export const analytics = browser ? getAnalytics(app) : undefined;
 
 if (browser) {
   if (dev) {

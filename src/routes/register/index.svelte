@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { logEvent, setUserId } from 'firebase/analytics';
   import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
   import { goto } from '$app/navigation';
-  import { auth } from '$lib/firebase';
+  import { auth, analytics } from '$lib/firebase';
   import { authStore } from '$lib/stores/auth';
 
   let loading = true;
@@ -37,6 +38,13 @@
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdTokenResult();
+
+      if (analytics) {
+        setUserId(analytics, userCredential.user.uid);
+        logEvent(analytics, 'sign_up', {
+          method: 'Email',
+        });
+      }
 
       authStore.set({
         isLoading: false,
