@@ -30,6 +30,7 @@
 
   let error = '';
   let places: any;
+  let loading = false;
 
   // Form inputs.
   let direction = 'from';
@@ -130,13 +131,20 @@
       return;
     }
 
-    if (!_user) {
-      const userCredential = await signInAnonymously(auth);
-      _user = userCredential.user;
+    loading = true;
 
-      if (analytics) {
-        setUserId(analytics, _user.uid);
-        setUserProperties(analytics, { anonymous: true });
+    if (!_user) {
+      try {
+        const userCredential = await signInAnonymously(auth);
+        _user = userCredential.user;
+
+        if (analytics) {
+          setUserId(analytics, _user.uid);
+          setUserProperties(analytics, { anonymous: true });
+        }
+      } catch (err) {
+        loading = false;
+        return;
       }
     }
 
@@ -151,6 +159,7 @@
     if (!pickupTime || _minDate.isAfter(pickupTime)) {
       error = 'You must set a new pickup time';
       minDate = dayjs(localDate()).add(6, 'hours');
+      loading = false;
       return;
     }
 
@@ -160,6 +169,7 @@
       if (!returnTime || _minDate.isAfter(returnTime)) {
         error = 'You must set a new return time';
         minDate = dayjs(localDate()).add(6, 'hours');
+        loading = false;
         return;
       }
 
@@ -168,42 +178,48 @@
 
     let _pickupTime = transformToMexicoTimezone(pickupTime).valueOf();
 
-    const reservationRef = await addDoc(collection(firestore, 'reservations'), {
-      userId: _user.uid,
-      direction,
-      fareType,
-      priceId,
-      placeId: selectedPlace.id,
-      placeName: selectedPlace.name,
-      placeIsAirport: selectedPlace.isAirport || true,
-      passengers,
-      luggage,
-      totalCost: $totalCost,
-      pickupTime: Timestamp.fromMillis(_pickupTime),
-      returnTime: _returnTime ? Timestamp.fromMillis(_returnTime) : null,
-      createdAt: serverTimestamp(),
-    });
-
-    await addDoc(collection(firestore, 'reservationsPrivate'), {
-      userId: _user.uid,
-      reservationId: reservationRef.id,
-      address,
-      flightNumber,
-      phoneNumber,
-      firstName,
-      lastName,
-      email,
-      createdAt: serverTimestamp(),
-    });
-
-    if (analytics) {
-      logEvent(analytics, 'generate_lead', {
-        currency: 'USD',
-        value: $totalCost,
+    try {
+      const reservationRef = await addDoc(collection(firestore, 'reservations'), {
+        userId: _user.uid,
+        direction,
+        fareType,
+        priceId,
+        placeId: selectedPlace.id,
+        placeName: selectedPlace.name,
+        placeIsAirport: selectedPlace.isAirport || true,
+        passengers,
+        luggage,
+        totalCost: $totalCost,
+        pickupTime: Timestamp.fromMillis(_pickupTime),
+        returnTime: _returnTime ? Timestamp.fromMillis(_returnTime) : null,
+        createdAt: serverTimestamp(),
       });
-    }
 
-    goto(`/reservations/${reservationRef.id}`);
+      await addDoc(collection(firestore, 'reservationsPrivate'), {
+        userId: _user.uid,
+        reservationId: reservationRef.id,
+        address,
+        flightNumber,
+        phoneNumber,
+        firstName,
+        lastName,
+        email,
+        createdAt: serverTimestamp(),
+      });
+
+      if (analytics) {
+        logEvent(analytics, 'generate_lead', {
+          currency: 'USD',
+          value: $totalCost,
+        });
+      }
+
+      goto(`/reservations/${reservationRef.id}`);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      loading = false;
+    }
   }
 
   onMount(() => {
@@ -513,7 +529,9 @@
       {/if}
 
       <section class="mt-3">
-        <button type="submit" class="btn btn--primary px-5 py-2 text-base">Book now</button>
+        <button type="submit" class="btn btn--primary px-5 py-2 text-base" disabled={loading}
+          >Book now</button
+        >
       </section>
     </form>
   </main>
