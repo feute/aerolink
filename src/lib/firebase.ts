@@ -1,3 +1,4 @@
+import { browser, dev } from '$app/env';
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
@@ -16,8 +17,8 @@ export const app = initializeApp(firebaseConfig);
 export const firestore = getFirestore(app);
 export const auth = getAuth(app);
 
-if (typeof window !== 'undefined') {
-  if (process.env.NODE_ENV === 'development') {
+if (browser) {
+  if (dev) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
   }
