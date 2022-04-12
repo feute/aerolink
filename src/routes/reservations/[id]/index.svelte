@@ -252,7 +252,9 @@
                 <div><ReservationStat label="First name" value={privateData.firstName} /></div>
                 <div><ReservationStat label="Last name" value={privateData.lastName} /></div>
                 <div><ReservationStat label="Phone number" value={privateData.phoneNumber} /></div>
-                <div><ReservationStat label="Email" value={privateData.email} /></div>
+                <div class="col-span-2">
+                  <ReservationStat label="Email" value={privateData.email} />
+                </div>
                 <div>
                   <ReservationStat label="Flight number" value={privateData.flightNumber} />
                 </div>
