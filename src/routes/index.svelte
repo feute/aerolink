@@ -1,5 +1,5 @@
 <svelte:head>
-  <title>Aerolink</title>
+  <title>Aerolink | Shuttle Service for San Miguel de Allende</title>
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4">
