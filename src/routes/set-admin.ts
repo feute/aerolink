@@ -1,4 +1,4 @@
-import path from 'path';
+import { resolve as pathResolve } from 'path';
 import { dev } from '$app/env';
 import { cert, initializeApp, getApps } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
@@ -22,7 +22,7 @@ export const post: RequestHandler = async ({ request }) => {
     };
   }
 
-  const credential = cert(path.resolve('src', 'firebase-admin.json'));
+  const credential = cert(pathResolve('src', 'firebase-admin.json'));
 
   const apps = getApps();
 
